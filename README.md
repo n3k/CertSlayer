@@ -10,6 +10,7 @@ This is a tool to instantly test if an application handles SSL certificates the 
 - Remember to install certslayer.net.crt as a trusted root CA Certificate
 
 > python CertSlayer.py -h
+```
 Usage: CertSlayer.py [options]
 
 Options:
@@ -18,6 +19,7 @@ Options:
   -v, --verbose         Verbose mode
 
 > python CertSlayer.py -d www.google.com
+```
 
 The proxy server binds to 8080 and redirects the connections made to the monitored domains to a
 rouge web server that it is setup on the fly with a specific test certificate.
@@ -25,7 +27,7 @@ rouge web server that it is setup on the fly with a specific test certificate.
 It generates a .CSV with the results of every test:
 
 Example:
-
+```
 Client Address,Hostname,Current TestCase,Expected,Actual
 127.0.0.1,www.google.com,Trusted CA Invalid Signature,Certificate Rejected,Certificate Rejected
 127.0.0.1,www.google.com,Signed with Unknown CA,Certificate Rejected,Certificate Rejected
@@ -36,6 +38,6 @@ Client Address,Hostname,Current TestCase,Expected,Actual
 127.0.0.1,www.google.com,Signed with MD4,Certificate Rejected,Certificate Rejected
 127.0.0.1,www.google.com,Expired Certificate,Certificate Rejected,Certificate Rejected
 127.0.0.1,www.google.com,Not Yet Valid Certificate,Certificate Rejected,Certificate Rejected
-
+```
 ## Author
 * [Enrique Nissim](https://twitter.com/kiqueNissim) (developer)
