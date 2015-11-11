@@ -3,7 +3,7 @@ This is a tool to instantly test if an application handles SSL certificates the 
 
 ## Todo
 * Add an option to set the listening port of the proxy server :)
-* Add more certificate tests
+* Add more certificate test cases
 
 ## Usage
 
