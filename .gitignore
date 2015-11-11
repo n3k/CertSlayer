@@ -1,0 +1,7 @@
+.idea/
+*.pyc
+*.txt
+CertSlayer/certificates/*.crt
+CertSlayer/certificates/*.key
+CertSlayer/testing/certificates/
+*.csv
