@@ -24,7 +24,7 @@ Options:
 
 
 The proxy server binds to 8080 and redirects the connections made to the monitored domains to a
-rouge web server that it is setup on the fly with a specific test certificate.
+rogue web server that is setup on the fly with a specific test certificate.
 
 It generates a .CSV with the results of every test:
 
