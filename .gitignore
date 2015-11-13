@@ -3,5 +3,6 @@
 *.txt
 CertSlayer/certificates/*.crt
 CertSlayer/certificates/*.key
-CertSlayer/testing/certificates/
+CertSlayer/testing/certificates/*.crt
+CertSlayer/testing/certificates/*.key
 *.csv

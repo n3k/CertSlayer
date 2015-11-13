@@ -4,6 +4,7 @@ python:
 # command to install dependencies
 install:
 #  - pip install .
-  - pip install -r requirements.txt
+  - pip install pyOpenSSL==0.15.1
+  - pip install urllib3==1.12
 # command to run tests
 script: nosetests CertSlayer/testing/TestCertManager.py  CertSlayer/testing/TestConfiguration.py CertSlayer/testing/TestFakeTLSServer.py CertSlayer/testing/TestHttpData.py
