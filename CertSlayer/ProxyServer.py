@@ -290,10 +290,8 @@ class ProxyHandlerCertificateTest(ProxyHandler):
 
         self.current_destination = self.get_destination_from_data()
 
-        for domain in TestController.get_monitored_domains():
-            if domain == self.current_destination.host:
-                self.redirect_destination()
-                break
+        if TestController.match_monitored_domains(self.current_destination.host):
+            self.redirect_destination()
 
         # Else Reply 200 Connection Established and forward data
         self.send_data(socket_to=self.request, data="HTTP/1.0 200 Connection established\r\n\r\n")
