@@ -13,6 +13,7 @@ from Configuration import Configuration
 class ProxyThreadedServer(SocketServer.ThreadingTCPServer):
     def __init__(self, server_address, RequestHandlerClass):
         SocketServer.ThreadingTCPServer.__init__(self, server_address, RequestHandlerClass)
+        self.allow_reuse_address = True
 
 class Destination(object):
     """
