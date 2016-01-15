@@ -16,7 +16,9 @@ Usage: CertSlayer.py [options]
 
 Options:
   -h, --help            show this help message and exit
-  -d DOMAINS_ARG, --domains=DOMAINS_ARG   Set a list of comma-separated domains
+  -d DOMAINS_ARG, --domain=DOMAINS_ARG
+                        Domain to be monitored, might be used multiple times
+                        and supports regular expressions
   -v, --verbose         Verbose mode
 ```
 
