@@ -2,6 +2,7 @@ __author__ = 'n3k'
 
 import ConfigParser
 import os
+#from OpenSSL import crypto
 
 from Utils import Singleton
 
@@ -14,6 +15,8 @@ class Configuration(object):
     This class exposes methods to retrieve the filenames and saves dynamic server settings
     """
     __metaclass__ = Singleton
+
+    #SAVED_x509_GetExtension = None
 
     SECTION_CA_CERTIFICATE_SETTINGS = "CA_CERTIFICATE_SETTINGS"
     SECTION_TEMPORAL_CERTIFICATES = "TEMPORAL_CERTIFICATES"
@@ -32,11 +35,22 @@ class Configuration(object):
         self._verbose_mode = value
 
     def __init__(self, config_filename="config.ini"):
+        #self._hook_GetExtension_x509()
         self.verbose_mode = False
         self.config_filename = config_filename
         if self._check_file_existence():
             self._config = ConfigParser.ConfigParser()
             self._config.read(self.config_filename)
+
+    #@staticmethod
+    #def _x509_custom_GetExtension(instance, index):
+    #    extension = Configuration.SAVED_x509_GetExtension(instance, index)
+    #    print extension.get_short_name()
+    #    return extension
+
+    #def _hook_GetExtension_x509(self):
+    #    Configuration.SAVED_x509_GetExtension = crypto.X509.get_extension
+    #    crypto.X509.get_extension = self._x509_custom_GetExtension
 
     def create_new_configuration(self, config_filename):
         self.config_filename = config_filename

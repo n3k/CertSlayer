@@ -5,6 +5,11 @@ from CertSlayer.FakeTLSServer import WebServerSetup
 from CertSlayer.CertManager import CertManager
 from CertSlayer.Configuration import Configuration
 
+"""
+Run with nosetests:
+> nosetests TestFakeTLSServer.py
+"""
+
 
 class callbackTest(object):
 

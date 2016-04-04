@@ -2,6 +2,11 @@ import unittest
 
 from CertSlayer.HttpData import HttpResponse, HttpRequest
 
+"""
+Run with nosetests:
+> nosetests TestHttpData.py
+"""
+
 class TestHttpData(unittest.TestCase):
 
     def test_httprequest_simple_parse(self):

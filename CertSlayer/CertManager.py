@@ -66,6 +66,14 @@ class CertManager(object):
         data += "Issuer City: %s\n" % x509.get_issuer().L
         data += "Issuer Organization: %s\n" % x509.get_issuer().O
         data += "Issuer Organizational Unit: %s\n" % x509.get_issuer().OU
+
+        for i in xrange(0, x509.get_extension_count()):
+            extension = x509.get_extension(i)
+            try:
+                data += "Extension - " + extension.get_short_name() + " " + extension.get_data() + "\n"
+            except UnicodeDecodeError:
+                data += "Extension - " + extension.get_short_name() + " " + "".join(["\\x{0:2x}".format(ord(_)) for _ in extension.get_data()]) + "\n"
+
         return data
 
     @classmethod
@@ -107,6 +115,16 @@ class CertManager(object):
 
         return ca_cert, k
 
+    @classmethod
+    def duplicate_certificate_without_extensions_or_signature(cls, x509):
+        cert = crypto.X509()
+        cert.set_version(x509.get_version())
+        cert.set_serial_number(x509.get_serial_number())
+        cert.set_subject(x509.get_subject())
+        cert.set_issuer(x509.get_issuer())
+        cert.set_notAfter(x509.get_notAfter())
+        cert.set_notBefore(x509.get_notBefore())
+        return cert
 
     @classmethod
     def create_trusted_ca_certificate(cls, ca_certificate_details={}):

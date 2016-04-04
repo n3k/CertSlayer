@@ -1,9 +1,9 @@
 import os
 
-from CertSlayer.TestController import TestController
-from CertSlayer.TestSuite import *
-from CertSlayer.ProxyServer import ProxyServer, ProxyHandlerCertificateTest
-from CertSlayer.Configuration import Configuration
+from TestController import TestController
+from TestSuite import *
+from ProxyServer import ProxyServer, ProxyHandlerCertificateTest
+from Configuration import Configuration
 
 
 class TestCertSlayer(object):
@@ -19,6 +19,7 @@ class TestCertSlayer(object):
 
     def main(self):
         Configuration().fake_server_address = ("127.0.0.1", 0)
+        Configuration().verbose_mode = True
         Configuration().testcase_list = [CertificateInvalidCASignature,
                                          CertificateUnknownCA,
                                          CertificateSignedWithCA,

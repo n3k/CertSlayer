@@ -6,6 +6,11 @@ import OpenSSL
 from CertSlayer.CertManager import CertManager
 from CertSlayer.Configuration import Configuration
 
+"""
+Run with nosetests:
+> nosetests TestCertManager.py
+"""
+
 
 class TestCertManager(unittest.TestCase):
 

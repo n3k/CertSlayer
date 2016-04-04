@@ -3,6 +3,10 @@ import os
 
 from CertSlayer.Configuration import Configuration
 
+"""
+Run with nosetests:
+> nosetests TestConfiguration.py
+"""
 
 class TestConfiguration(unittest.TestCase):
 

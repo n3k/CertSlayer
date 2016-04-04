@@ -100,9 +100,18 @@ class CertificateWrongCN(CertificateTC):
     def create_testing_certificate(self):
         # Get the original certificate
         x509 = self.cert_manager.get_domain_certificate(self.hostname, self.port)
-        x509.get_subject().CN = ".".join(["www", Utils.get_random_name(5), "com"])
-        #print x509.get_subject().CN
-        return self.cert_manager.sign_with_root_ca(x509)
+        # Duplicate the basic fields
+        new_x509 = self.cert_manager.duplicate_certificate_without_extensions_or_signature(x509)
+        # Change the CN
+        new_x509.get_subject().CN = ".".join(["www", Utils.get_random_name(5), "com"])
+        # Add all the extensions except for the subjectAltName
+        extensions = []
+        for i in xrange(0, x509.get_extension_count()):
+            extension = x509.get_extension(i)
+            if extension.get_short_name() != "subjectAltName":
+                extensions.append(extension)
+        new_x509.add_extensions(extensions)
+        return self.cert_manager.sign_with_root_ca(new_x509)
 
     def __str__(self):
         return "Wrong CNAME"
