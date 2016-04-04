@@ -22,15 +22,13 @@ class CertSlayer(object):
 
     def main(self):
         parser = optparse.OptionParser()
-        parser.add_option("-d", "--domains", dest="domains_arg",
-                          help="Set a list of comma-separated domains")
+        parser.add_option("-d", "--domain", dest="domains_arg", action="append",
+                          help="Domain to be monitored, might be used multiple times and supports regular expressions")
         parser.add_option("-v", "--verbose", dest="verbose_arg", default=False,
                           action="store_true", help="Verbose mode")
         (options, args) = parser.parse_args()
-        if not options.domains_arg:   # if domains_arg is not given
+        if not options.domains_arg or len(options.domains_arg) <1:   # if domains_arg is not given
             parser.error('Domain not given')
-
-        domain_list = options.domains_arg.split(",")
 
         Configuration().fake_server_address = ("127.0.0.1", 0)
         Configuration().verbose_mode = options.verbose_arg
@@ -44,7 +42,7 @@ class CertSlayer(object):
                                          CertificateExpired,
                                          CertificateNotYetValid
                                          ]
-        TestController.set_monitored_domains(domain_list)
+        TestController.set_monitored_domains(options.domains_arg)
         proxy = ProxyServer(proxy_handler=ProxyHandlerCertificateTest)
         proxy.start()
 

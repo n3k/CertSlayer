@@ -5,6 +5,8 @@ from CertManager import CertManager
 from FakeTLSServer import WebServerSetup
 import threading
 import os
+import re
+
 
 class TestControllerException(Exception):
     pass
@@ -44,6 +46,17 @@ class TestController(object):
     @classmethod
     def get_monitored_domains(cls):
         return cls.__monitored_domains
+
+    @classmethod
+    def match_monitored_domains(cls, domain):
+        for monitored_domain in cls.__monitored_domains:
+            try:
+                if re.match(monitored_domain, domain):
+                    return True
+            except re.error:
+                if domain == monitored_domain:
+                    return True
+        return False
 
     def __init__(self, client_address, hostname, port, testcase_list):
         self.client_address = client_address
