@@ -102,22 +102,16 @@ class WebServerSetup(object):
 
 
 if __name__ == '__main__':
-    # from CertManager import CertManager
-    # cert_manager = CertManager()
-    # crt_file, key_file = cert_manager.generate_certificate()
+    from CertManager import CertManager
+
     class test(object):
         def __init__(self):
             print "CALLBACK"
 
-    import os
-
-    name = os.path.join(Configuration().get_temp_certificate_folder(), "z6e1K")
-    key = name + ".key"
-    crt = name + ".crt"
-    worker1 = WebServerSetup(keyfile=key, certfile=crt, server_address=("127.0.0.1", 4444), callback=test)
+    cert_manager = CertManager()
+    crt_file, key_file = cert_manager.generate_certificate()
+    worker1 = WebServerSetup(keyfile=key_file, certfile=crt_file, callback=test)
     print worker1.start()
-    import time
-    time.sleep(200)
     #worker1.kill()
 
 

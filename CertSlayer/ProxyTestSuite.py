@@ -3,7 +3,6 @@ from abc import ABCMeta, abstractmethod
 from CertManager import CertManager
 import Utils
 
-
 class CertificateTC(object):
 
     __metaclass__ = ABCMeta

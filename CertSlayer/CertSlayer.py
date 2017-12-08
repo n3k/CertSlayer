@@ -3,8 +3,8 @@ __author__ = 'n3k'
 import os
 import optparse
 
-from TestController import TestController
-from TestSuite import *
+from ProxyModeTestController import TestProxyModeController
+from ProxyTestSuite import *
 from ProxyServer import ProxyServer, ProxyHandlerCertificateTest
 from Configuration import Configuration
 
@@ -32,6 +32,8 @@ class CertSlayer(object):
 
         Configuration().fake_server_address = ("127.0.0.1", 0)
         Configuration().verbose_mode = options.verbose_arg
+
+        # Define the test cases
         Configuration().testcase_list = [CertificateInvalidCASignature,
                                          CertificateUnknownCA,
                                          CertificateSignedWithCA,
@@ -42,7 +44,11 @@ class CertSlayer(object):
                                          CertificateExpired,
                                          CertificateNotYetValid
                                          ]
-        TestController.set_monitored_domains(options.domains_arg)
+
+        # Set the domains that will be tracked
+        TestProxyModeController.set_monitored_domains(options.domains_arg)
+
+        # Start the Proxy to Trap Connections to targeted domains
         proxy = ProxyServer(proxy_handler=ProxyHandlerCertificateTest)
         proxy.start()
 

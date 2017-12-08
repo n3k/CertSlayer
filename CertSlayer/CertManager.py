@@ -154,7 +154,7 @@ class CertManager(object):
         cert.get_subject().C = x509_details.get("C", "AR") #Country
         cert.get_subject().ST = x509_details.get("ST", "Argentina") #State
         cert.get_subject().L = x509_details.get("L", "CABA") #City
-        cert.get_subject().O = x509_details.get("O", "CORE Security") #Organization
+        cert.get_subject().O = x509_details.get("O", "MovEdiEdi") #Organization
         cert.get_subject().OU = x509_details.get("OU", "SCS") #Organizational Unit
         cert.get_subject().CN = x509_details.get("CN", "127.0.0.1")
         return cert.get_subject()
@@ -184,7 +184,7 @@ class CertManager(object):
         This method creates a certificate signed with our CA Certificate
         """
         # generate the key
-        k = attributes.get("public_key", self.generate_key(bits=1024))
+        k = attributes.get("public_key", self.generate_key(bits=2048))
 
         # create the cert
         cert = crypto.X509()
@@ -205,11 +205,10 @@ class CertManager(object):
         signing_hash = attributes.get("signing_hash", "sha256")
 
         if attributes.get("self-signed", False):
-            key = attributes.get("signing_key", k)
-            cert.sign(key, signing_hash)
+            cert.sign(k, signing_hash)
         else:
-        #     Sign this cert with our CA Cert
-            ca_key = self.load_key(filename=Configuration().get_ca_key_file())
+            # Get the CA Key from the attributes or use the default CertSlayer CA Key
+            ca_key = attributes.get("ca_key", self.load_key(filename=Configuration().get_ca_key_file()))
             cert.sign(ca_key, signing_hash)
 
         return self._write_cert_and_key_to_disk(cert, k)

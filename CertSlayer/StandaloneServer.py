@@ -1,0 +1,25 @@
+import time
+from Logger import Logger
+from StandaloneModeTestController import TestStandaloneModeController
+from Configuration import Configuration
+
+class StandaloneServer(object):
+
+    def __init__(self):
+        # We need the web server running on all the interfaces
+        #Configuration().fake_server_address = ("0.0.0.0", 0)
+        pass
+
+    def start(self, hostname):
+        # The hostname can be an IP
+        test_controller = TestStandaloneModeController(
+            hostname=hostname,
+            testcase_list=Configuration().testcase_list
+        )
+        for i in xrange(len(Configuration().testcase_list)):
+            address, port = test_controller.configure_web_server()
+            if Configuration().verbose_mode:
+                print "+ Web Server for host listening at %s on port %d" % (address, port)
+            raw_input(">> Hit enter for setting the next TestCase")
+            print "+ Killing previous server"
+            test_controller.cleanup()

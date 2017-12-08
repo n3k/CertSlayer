@@ -6,7 +6,8 @@ import socket
 from select import select
 from HttpData import HttpRequest, HttpResponse, HttpDataException
 from Logger import Logger
-from TestController import TestController, TestControllerException
+from ProxyModeTestController import TestProxyModeController
+from TestController import TestControllerException
 from Configuration import Configuration
 
 
@@ -258,15 +259,15 @@ class ProxyHandlerCertificateTest(ProxyHandler):
         """Overwrite the finish() to include the killing of the web_server"""
         ProxyHandler.finish(self)
         if self.current_destination:
-            TestController.instance(self.client_address,
+            TestProxyModeController.instance(self.client_address,
                                     self.current_destination.host,
                                     self.current_destination.port).cleanup()
 
     def redirect_destination(self):
         try:
-            server_address = TestController.instance(self.client_address,
+            server_address = TestProxyModeController.instance(self.client_address,
                                                      self.current_destination.host,
-                                                     self.current_destination.port).configure_fake_server()
+                                                     self.current_destination.port).configure_web_server()
             if Configuration().verbose_mode:
                 print "Web Server for host %s listening at %s on port %d" % (self.current_destination.host, server_address[0], server_address[1])
         except TestControllerException:
@@ -291,7 +292,7 @@ class ProxyHandlerCertificateTest(ProxyHandler):
 
         self.current_destination = self.get_destination_from_data()
 
-        if TestController.match_monitored_domains(self.current_destination.host):
+        if TestProxyModeController.match_monitored_domains(self.current_destination.host):
             self.redirect_destination()
 
         # Else Reply 200 Connection Established and forward data
