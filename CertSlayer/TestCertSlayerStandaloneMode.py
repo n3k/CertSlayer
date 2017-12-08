@@ -18,7 +18,7 @@ class TestCertSlayerStandaloneMode(object):
 
     def main(self):
         Configuration().fake_server_address = ("0.0.0.0", 4444)
-        Configuration().verbose_mode = True
+        Configuration().verbose_mode = False
         Configuration().testcase_list = [
             StandaloneTestSuite.CertificateInvalidCASignature,
             StandaloneTestSuite.CertificateUnknownCA,
