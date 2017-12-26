@@ -30,7 +30,7 @@ class TestCertSlayerStandaloneMode(object):
             StandaloneTestSuite.CertificateExpired,
             StandaloneTestSuite.CertificateNotYetValid
         ]
-        StandaloneServer().start("201.213.166.24")
+        StandaloneServer().start("j42d1i.ipq.co")
 
 if __name__ == "__main__":
     certslayer = TestCertSlayerStandaloneMode()

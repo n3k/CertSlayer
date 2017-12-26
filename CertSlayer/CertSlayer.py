@@ -4,8 +4,10 @@ import os
 import optparse
 
 from ProxyModeTestController import TestProxyModeController
-from ProxyTestSuite import *
+import ProxyTestSuite
+import StandaloneTestSuite
 from ProxyServer import ProxyServer, ProxyHandlerCertificateTest
+from StandaloneServer import StandaloneServer
 from Configuration import Configuration
 
 
@@ -23,34 +25,74 @@ class CertSlayer(object):
     def main(self):
         parser = optparse.OptionParser()
         parser.add_option("-d", "--domain", dest="domains_arg", action="append",
-                          help="Domain to be monitored, might be used multiple times and supports regular expressions")
+                          help="Domain to be monitored, might be used multiple times and supports regular expressions (Only valid for proxy mode)")
+        parser.add_option("-p", "--port", dest="port_arg", action="store",
+                          default="8080", help="port to listen")
+        parser.add_option("-m", "--mode", dest="mode_arg", action="store",
+                          default="proxy", help="Operation mode: proxy or standalone")
+        parser.add_option("-i", "--hostname", dest="host_arg", action="store",
+                          default="localhost",
+                          help="Hostname: the IP address or Domain name that the certificate CN will stand for (Only valid for standalone mode)")
         parser.add_option("-v", "--verbose", dest="verbose_arg", default=False,
                           action="store_true", help="Verbose mode")
         (options, args) = parser.parse_args()
-        if not options.domains_arg or len(options.domains_arg) <1:   # if domains_arg is not given
-            parser.error('Domain not given')
 
-        Configuration().fake_server_address = ("127.0.0.1", 0)
+        if options.verbose_arg:
+            print "-Info: verbose mode enabled"
         Configuration().verbose_mode = options.verbose_arg
 
-        # Define the test cases
-        Configuration().testcase_list = [CertificateInvalidCASignature,
-                                         CertificateUnknownCA,
-                                         CertificateSignedWithCA,
-                                         CertificateSelfSigned,
-                                         CertificateWrongCN,
-                                         CertificateSignWithMD5,
-                                         CertificateSignWithMD4,
-                                         CertificateExpired,
-                                         CertificateNotYetValid
-                                         ]
+        if not options.port_arg:
+            print "-Info: port not specified, using 8080"
+        port = int(options.port_arg,10)
 
-        # Set the domains that will be tracked
-        TestProxyModeController.set_monitored_domains(options.domains_arg)
+        if options.mode_arg == "proxy":
 
-        # Start the Proxy to Trap Connections to targeted domains
-        proxy = ProxyServer(proxy_handler=ProxyHandlerCertificateTest)
-        proxy.start()
+            if not options.domains_arg or len(options.domains_arg) <1:   # if domains_arg is not given
+                parser.error("-Error: target domain was not specified")
+
+            Configuration().fake_server_address = ("127.0.0.1", 0)
+
+            # Define the test cases
+            Configuration().testcase_list = [
+                ProxyTestSuite.CertificateInvalidCASignature,
+                ProxyTestSuite.CertificateUnknownCA,
+                ProxyTestSuite.CertificateSignedWithCA,
+                ProxyTestSuite.CertificateSelfSigned,
+                ProxyTestSuite.CertificateWrongCN,
+                ProxyTestSuite.CertificateSignWithMD5,
+                ProxyTestSuite.CertificateSignWithMD4,
+                ProxyTestSuite.CertificateExpired,
+                ProxyTestSuite.CertificateNotYetValid
+            ]
+
+            # Set the domains that will be tracked
+            TestProxyModeController.set_monitored_domains(options.domains_arg)
+
+            # Start the Proxy to Trap Connections to targeted domains
+            proxy = ProxyServer(server_address=("0.0.0.0", port),
+                                proxy_handler=ProxyHandlerCertificateTest)
+            proxy.start()
+
+        elif options.mode_arg == "standalone":
+            Configuration().fake_server_address = ("0.0.0.0", port)
+            Configuration().testcase_list = [
+                StandaloneTestSuite.CertificateInvalidCASignature,
+                StandaloneTestSuite.CertificateUnknownCA,
+                StandaloneTestSuite.CertificateSignedWithCA,
+                StandaloneTestSuite.CertificateSelfSigned,
+                StandaloneTestSuite.CertificateWrongCN,
+                StandaloneTestSuite.CertificateSignWithMD5,
+                StandaloneTestSuite.CertificateSignWithMD4,
+                StandaloneTestSuite.CertificateExpired,
+                StandaloneTestSuite.CertificateNotYetValid
+            ]
+            if not options.host_arg:
+                print "-Warning: hostname not given, using 'localhost'"
+            StandaloneServer().start(options.host_arg)
+
+        else:
+            parser.error('-Error: Unsupported mode')
+
 
 if __name__ == "__main__":
     certslayer = CertSlayer()
