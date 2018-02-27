@@ -3,6 +3,8 @@ This is a tool to instantly test if an application handles SSL certificates the 
 
 ## Todo
 * Add more certificate test cases
+* Implement this http://www.cs.bham.ac.uk/~garciaf/publications/spinner.pdf
+* Implement STARTTLS
 
 ## Usage
 The tool supports two modes:
