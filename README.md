@@ -9,7 +9,7 @@ This is a tool to instantly test if an application handles SSL certificates the 
 ## Usage
 The tool supports two modes:
 - Proxy: certslayer sets itself as a proxy and monitors for the specified target domains.
-- Standalone: certslayer creates a web server configured with the special test certificate. I found this service http://cybernetnews.com/create-free-dns/ to be useful.
+- Standalone: certslayer creates a web server configured with the special test certificate. I found this service http://ipq.co/ to be useful.
 - In both cases it will be necessary to install certslayer.net.crt as a trusted root CA Certificate.
 
 > python CertSlayer.py -h
