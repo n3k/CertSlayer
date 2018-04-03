@@ -17,7 +17,8 @@ class StandaloneServer(object):
             testcase_list=Configuration().testcase_list
         )
         for i in xrange(len(Configuration().testcase_list)):
-            address, port = test_controller.configure_web_server()
+            server_address = test_controller.configure_web_server()
+            address, port = server_address
             if Configuration().verbose_mode:
                 print "+ Web Server for host listening at %s on port %d" % (address, port)
             raw_input(">> Hit enter for setting the next TestCase")

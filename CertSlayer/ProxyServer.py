@@ -257,22 +257,26 @@ class ProxyHandlerCertificateTest(ProxyHandler):
 
     def finish(self):
         """Overwrite the finish() to include the killing of the web_server"""
-        ProxyHandler.finish(self)
         if self.current_destination:
             TestProxyModeController.instance(self.client_address,
                                     self.current_destination.host,
                                     self.current_destination.port).cleanup()
+        ProxyHandler.finish(self)
 
     def redirect_destination(self):
-        try:
-            server_address = TestProxyModeController.instance(self.client_address,
+        #try:
+        server_address = TestProxyModeController.instance(self.client_address,
                                                      self.current_destination.host,
                                                      self.current_destination.port).configure_web_server()
-            if Configuration().verbose_mode:
-                print "Web Server for host %s listening at %s on port %d" % (self.current_destination.host, server_address[0], server_address[1])
-        except TestControllerException:
-            # This means the TestSuite finished, do not redirect anymore
+        if server_address == None:
             return
+
+        if Configuration().verbose_mode:
+            print "Web Server for host %s listening at %s on port %d" % (self.current_destination.host, server_address[0], server_address[1])
+        #except TestControllerException:
+            # This means the TestSuite finished, do not redirect anymore
+            #return
+
         address, port = server_address
         # Remove the created connection to the original destination
         self.readable_sockets.remove(self.current_destination.socket_connection)

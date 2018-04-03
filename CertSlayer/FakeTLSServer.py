@@ -1,6 +1,5 @@
 __author__ = 'n3k'
 
-from Configuration import Configuration
 from Logger import Logger
 from BaseHTTPServer import HTTPServer
 from SimpleHTTPServer import SimpleHTTPRequestHandler
@@ -97,7 +96,18 @@ class WebServerSetup(object):
         return server_address
 
     def kill(self):
-        self.http_worker.httpd.shutdown()
+        """
+        This is likely ending in deadlock, as the thread never returns after the call to server_close
+        For now just 'pass' -> do not kill the web server created
+
+        if self.http_worker.isAlive():
+            self.http_worker.httpd.server_close()
+        """
+        pass
+
+
+
+
 
 
 

@@ -22,6 +22,9 @@ class TestProxyModeController(TestController):
     """A class variable to keep tracking of domains under test"""
     __monitored_domains = []
 
+    # A lock for the webserver
+    __webserver_lock = threading.Lock()
+
     @classmethod
     def remove_monitored_domain(cls, domain):
         cls.__domain_monitor_lock.acquire()
@@ -49,6 +52,7 @@ class TestProxyModeController(TestController):
         for monitored_domain in cls.__monitored_domains:
             try:
                 if re.match(monitored_domain, domain):
+                    #print "Monitored Domain: %s - Domain: %s" % (monitored_domain, domain)
                     return True
             except re.error:
                 if domain == monitored_domain:
@@ -87,7 +91,28 @@ class TestProxyModeController(TestController):
             return test_case
         except StopIteration:
             self.remove_monitored_domain(self.hostname)
-            raise TestControllerException("TestSuite has finished for domain: %s" % self.hostname)
+            #raise TestControllerException("TestSuite has finished for domain: %s" % self.hostname)
+            return None
+
+    def cleanup(self):
+        #print "+] trying to aqcuire lock for cleanup"
+        #self.__webserver_lock.acquire()
+        #print "+] aquired lock for cleanup"
+        super(TestProxyModeController, self).cleanup()
+        #print "+] trying to release lock for cleanup"
+        #self.__webserver_lock.release()
+        #print "+] released lock for cleanup"
+
+
+    def configure_web_server(self):
+        #print "+] trying to aqcuire lock for creating web server"
+        self.__webserver_lock.acquire()
+        #print "+] aquired lock for creating web server"
+        server_address = super(TestProxyModeController, self).configure_web_server()
+        #print "+] trying to release lock for creating web server"
+        self.__webserver_lock.release()
+        #print "+] released lock for creating web server"
+        return server_address
 
     def register_test_result(self, actual_status):
         logline = "%s,%s,%s,%s,%s\n" % (self.client_address,

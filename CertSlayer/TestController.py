@@ -36,6 +36,8 @@ class TestController(object):
     def create_certificate(self):
         # Get the next TC of the List
         self.current_testcase = self.get_next_testcase()
+        if self.current_testcase == None:
+            return (None,), False
         # Make an instance
         self.current_testcase = self.current_testcase(self.hostname, self.port)
         cert_folder = Configuration().get_temp_certificate_folder()
@@ -45,7 +47,7 @@ class TestController(object):
         key_filename = os.path.join(cert_folder, key)
         self.remove_filename_list.append(crt_filename)
         self.remove_filename_list.append(key_filename)
-        return crt_filename, key_filename
+        return (crt_filename, key_filename), True
 
     def get_next_testcase(self):
         pass
@@ -63,7 +65,11 @@ class TestController(object):
         if self.current_testcase is not None:
             self.register_test_result("Certificate Rejected")
 
-        self.crt_filename, self.key_filename = self.create_certificate()
+        certificate, status = self.create_certificate()
+        if not status:
+            return None
+
+        self.crt_filename, self.key_filename = certificate
         server_address = Configuration().fake_server_address
         print "+ Setting up WebServer with Test: %s" % self.current_testcase
         self.fake_server = WebServerSetup(keyfile=self.key_filename,
