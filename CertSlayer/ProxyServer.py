@@ -313,7 +313,12 @@ class ProxyServer(object):
 
     def start(self):
         server = ProxyThreadedServer(self.server_address, self.proxy_handler)
-        server.serve_forever()
+        try:
+            server.serve_forever()
+        except KeyboardInterrupt:
+            pass
+        finally:
+            server.server_close()
         #proxy = threading.Thread(target=server.serve_forever)
         #proxy.setDaemon(True)
         #proxy.start()

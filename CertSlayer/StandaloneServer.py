@@ -1,4 +1,5 @@
 import time
+import sys
 from Logger import Logger
 from StandaloneModeTestController import TestStandaloneModeController
 from Configuration import Configuration
@@ -21,6 +22,11 @@ class StandaloneServer(object):
             address, port = server_address
             if Configuration().verbose_mode:
                 print "+ Web Server for host listening at %s on port %d" % (address, port)
-            raw_input(">> Hit enter for setting the next TestCase")
+            try:
+                raw_input(">> Hit enter for setting the next TestCase")
+            except KeyboardInterrupt:
+                print "" # make sure prompt is on new line
+                test_controller.cleanup()
+                sys.exit(0)
             print "+ Killing previous server"
             test_controller.cleanup()
