@@ -10,6 +10,7 @@ from ssl import SSLError
 
 
 class FakeHTTPServer(HTTPServer):
+    allow_reuse_address = True
     def __init__(self, server_address, RequestHandlerClass, bind_and_activate=True, callback=None):
         self.callback = callback
         HTTPServer.__init__(self, server_address, RequestHandlerClass, bind_and_activate)
@@ -32,7 +33,12 @@ class SecureHTTPServer(threading.Thread):
         return self.httpd.socket.getsockname()
 
     def run(self):
-        self.httpd.serve_forever()
+        try:
+            self.httpd.serve_forever()
+        except KeyboardInterrupt:
+            pass
+        finally:
+            self.httpd.server_close()
 
 class FakeRequestHandler(SimpleHTTPRequestHandler):
 
@@ -96,14 +102,8 @@ class WebServerSetup(object):
         return server_address
 
     def kill(self):
-        """
-        This is likely ending in deadlock, as the thread never returns after the call to server_close
-        For now just 'pass' -> do not kill the web server created
-
         if self.http_worker.isAlive():
-            self.http_worker.httpd.server_close()
-        """
-        pass
+            self.http_worker.httpd.shutdown()
 
 
 
