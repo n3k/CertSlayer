@@ -1,7 +1,6 @@
-from TestController import TestController
-from Configuration import Configuration
-from FakeTLSServer import WebServerSetup
-from CertManager import CertManager
+from cert_slayer.TestController import TestController
+from cert_slayer.Configuration import Configuration
+from cert_slayer.CertManager import CertManager
 import os
 
 class TestStandaloneModeController(TestController):
@@ -26,7 +25,8 @@ class TestStandaloneModeController(TestController):
 
     def get_next_testcase(self):
         try:
-            test_case = self.testcase_iterator.next()
+            test_case = next(self.testcase_iterator)
+            self.test_case_completed = False
             return test_case
         except StopIteration:
             # TestSuite has finished
@@ -39,15 +39,17 @@ class TestStandaloneModeController(TestController):
             self.current_testcase.expected(),
             actual_status)
 
-        print logline
+        print(logline)
 
         self._log_test_result_file(logline)
         if Configuration().verbose_mode and self.crt_filename is not None:
             x509 = CertManager.load_certificate(self.crt_filename)
             if x509:
-                print CertManager.describe_certificate(x509)
+                print(CertManager.describe_certificate(x509))
 
     def notification(self):
         """This method is called when the client reached the web server successfully"""
-        self.register_test_result("Certificate Accepted")
+        self.register_test_result("Certificate Accepted")        
         self.current_testcase = None
+        self.test_case_completed = True
+       

@@ -1,10 +1,10 @@
 __author__ = 'n3k'
 
-from Configuration import Configuration
-from CertManager import CertManager
+from cert_slayer.Configuration import Configuration
+from cert_slayer.CertManager import CertManager
 
 import threading
-from TestController import TestController, TestControllerException
+from cert_slayer.TestController import TestController, TestControllerException
 import os
 import re
 
@@ -52,7 +52,7 @@ class TestProxyModeController(TestController):
         for monitored_domain in cls.__monitored_domains:
             try:
                 if re.match(monitored_domain, domain):
-                    #print "Monitored Domain: %s - Domain: %s" % (monitored_domain, domain)
+                    #print("Monitored Domain: %s - Domain: %s" % (monitored_domain, domain))
                     return True
             except re.error:
                 if domain == monitored_domain:
@@ -87,7 +87,7 @@ class TestProxyModeController(TestController):
 
     def get_next_testcase(self):
         try:
-            test_case = self.testcase_iterator.next()
+            test_case = next(self.testcase_iterator)
             return test_case
         except StopIteration:
             self.remove_monitored_domain(self.hostname)
@@ -95,23 +95,23 @@ class TestProxyModeController(TestController):
             return None
 
     def cleanup(self):
-        #print "+] trying to aqcuire lock for cleanup"
+        #print("+] trying to aqcuire lock for cleanup")
         #self.__webserver_lock.acquire()
-        #print "+] aquired lock for cleanup"
+        #print("+] aquired lock for cleanup")
         super(TestProxyModeController, self).cleanup()
-        #print "+] trying to release lock for cleanup"
+        #print("+] trying to release lock for cleanup")
         #self.__webserver_lock.release()
-        #print "+] released lock for cleanup"
+        #print("+] released lock for cleanup")
 
 
     def configure_web_server(self):
-        #print "+] trying to aqcuire lock for creating web server"
+        #print("+] trying to aqcuire lock for creating web server")
         self.__webserver_lock.acquire()
-        #print "+] aquired lock for creating web server"
+        #print("+] aquired lock for creating web server")
         server_address = super(TestProxyModeController, self).configure_web_server()
-        #print "+] trying to release lock for creating web server"
+        #print("+] trying to release lock for creating web server")
         self.__webserver_lock.release()
-        #print "+] released lock for creating web server"
+        #print("+] released lock for creating web server")
         return server_address
 
     def register_test_result(self, actual_status):
@@ -120,12 +120,12 @@ class TestProxyModeController(TestController):
                                               self.current_testcase,
                                               self.current_testcase.expected(),
                                               actual_status)
-        print logline
+        print(logline)
         self._log_test_result_file(logline)
         if Configuration().verbose_mode and self.crt_filename is not None:
             x509 = CertManager.load_certificate(self.crt_filename)
             if x509:
-                print CertManager.describe_certificate(x509)
+                print(CertManager.describe_certificate(x509))
 
     def notification(self):
         """This method is called when the client reached the web server successfully"""

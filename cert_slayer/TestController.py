@@ -1,8 +1,8 @@
 __author__ = 'n3k'
 
 import os
-from FakeTLSServer import WebServerSetup
-from Configuration import Configuration
+from cert_slayer.FakeTLSServer import WebServerSetup
+from cert_slayer.Configuration import Configuration
 
 class TestControllerException(Exception):
     pass
@@ -22,6 +22,10 @@ class TestController(object):
         self.remove_filename_list = []
         self.crt_filename = None
         self.key_filename = None
+        # This has to be set to False each time a new test case is going
+        # to be performed. Upon completion (in the notification function)
+        # It has to be set to True
+        self.test_case_completed = True 
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.cleanup()
@@ -71,7 +75,7 @@ class TestController(object):
 
         self.crt_filename, self.key_filename = certificate
         server_address = Configuration().fake_server_address
-        print "+ Setting up WebServer with Test: %s" % self.current_testcase
+        print("+ Setting up WebServer with Test: %s" % self.current_testcase)
         self.fake_server = WebServerSetup(keyfile=self.key_filename,
                                           certfile=self.crt_filename,
                                           server_address=server_address,

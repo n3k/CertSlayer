@@ -1,8 +1,8 @@
 import os
 
-from StandaloneServer import StandaloneServer
-import StandaloneTestSuite
-from Configuration import Configuration
+from cert_slayer.StandaloneServer import StandaloneServer
+import cert_slayer.StandaloneTestSuite as StandaloneTestSuite
+from cert_slayer.Configuration import Configuration
 
 
 class TestCertSlayerStandaloneMode(object):
@@ -24,11 +24,11 @@ class TestCertSlayerStandaloneMode(object):
             StandaloneTestSuite.CertificateUnknownCA,
             StandaloneTestSuite.CertificateSignedWithCA,
             StandaloneTestSuite.CertificateSelfSigned,
-            StandaloneTestSuite.CertificateWrongCN,
-            StandaloneTestSuite.CertificateSignWithMD5,
-            StandaloneTestSuite.CertificateSignWithMD4,
+            StandaloneTestSuite.CertificateWrongCN,            
             StandaloneTestSuite.CertificateExpired,
-            StandaloneTestSuite.CertificateNotYetValid
+            StandaloneTestSuite.CertificateNotYetValid,
+            StandaloneTestSuite.CertificateSignWithMD5,
+            StandaloneTestSuite.CertificateSignWithMD4
         ]
         StandaloneServer().start("j42d1i.ipq.co")
 

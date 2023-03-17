@@ -1,17 +1,16 @@
 __author__ = 'n3k'
 
-from Logger import Logger
-from BaseHTTPServer import HTTPServer
-from SimpleHTTPServer import SimpleHTTPRequestHandler
+from cert_slayer.Logger import Logger
+from http.server import HTTPServer, SimpleHTTPRequestHandler
 import ssl
 import threading
-from StringIO import StringIO
+from io import BytesIO
 from ssl import SSLError
-
 
 class FakeHTTPServer(HTTPServer):
     def __init__(self, server_address, RequestHandlerClass, bind_and_activate=True, callback=None):
         self.callback = callback
+        self.allow_reuse_address = True
         HTTPServer.__init__(self, server_address, RequestHandlerClass, bind_and_activate)
 
 
@@ -52,11 +51,11 @@ class FakeRequestHandler(SimpleHTTPRequestHandler):
         If we ever reach this method means that the SSL connection was accepted
         """
         # Perform the response
-        f = StringIO()
-        f.write("<html>\n")
-        f.write("<title>CertSlayer</title>\n")
-        f.write("<h1>Client connected</h1>")
-        f.write("</html>\n")
+        f = BytesIO()
+        f.write(b"<html>\n")
+        f.write(b"<title>CertSlayer</title>\n")
+        f.write(b"<h1>Client connected</h1>")
+        f.write(b"</html>\n")
         f.seek(0)
         self.send_response(200)
         self.send_header("Content-type", "text/html")
@@ -116,12 +115,12 @@ if __name__ == '__main__':
 
     class test(object):
         def __init__(self):
-            print "CALLBACK"
+            print("CALLBACK")
 
     cert_manager = CertManager()
     crt_file, key_file = cert_manager.generate_certificate()
     worker1 = WebServerSetup(keyfile=key_file, certfile=crt_file, callback=test)
-    print worker1.start()
+    print(worker1.start())
     #worker1.kill()
 
 

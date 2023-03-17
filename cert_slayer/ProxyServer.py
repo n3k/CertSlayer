@@ -1,19 +1,20 @@
 __author__ = 'n3k'
 
-import SocketServer
-import time
+import socketserver
+
 import socket
 from select import select
-from HttpData import HttpRequest, HttpResponse, HttpDataException
-from Logger import Logger
-from ProxyModeTestController import TestProxyModeController
-from TestController import TestControllerException
-from Configuration import Configuration
+from cert_slayer.HttpData import HttpRequest, HttpResponse, HttpDataException
+from cert_slayer.Utils import recv_timeout
+from cert_slayer.Logger import Logger
+from cert_slayer.ProxyModeTestController import TestProxyModeController
+from cert_slayer.TestController import TestControllerException
+from cert_slayer.Configuration import Configuration
 
 
-class ProxyThreadedServer(SocketServer.ThreadingTCPServer):
+class ProxyThreadedServer(socketserver.ThreadingTCPServer):
     def __init__(self, server_address, RequestHandlerClass):
-        SocketServer.ThreadingTCPServer.__init__(self, server_address, RequestHandlerClass)
+        socketserver.ThreadingTCPServer.__init__(self, server_address, RequestHandlerClass)
         self.allow_reuse_address = True
 
 class Destination(object):
@@ -27,7 +28,7 @@ class Destination(object):
         self.port = port
         self.address = address
 
-class ProxyHandler(SocketServer.BaseRequestHandler):
+class ProxyHandler(socketserver.BaseRequestHandler):
     """
     This is an asynchronous handler
     """
@@ -43,7 +44,7 @@ class ProxyHandler(SocketServer.BaseRequestHandler):
         self.readable_sockets = []
         self.destination_list = []
         self.current_destination = None
-        SocketServer.BaseRequestHandler.__init__(self, request, client_address, server)
+        socketserver.BaseRequestHandler.__init__(self, request, client_address, server)
 
     def setup(self):
         self.connection = self.request
@@ -73,14 +74,14 @@ class ProxyHandler(SocketServer.BaseRequestHandler):
         Reads the client socket and returns the len of bytes received
         """
         try:
-            self.http_data = HttpRequest.parse(self._recv_timeout(self.request))
+            self.http_data = HttpRequest.parse(recv_timeout(self.request))
             return len(self.http_data)
         except HttpDataException:
             return 0
 
     def get_destination_from_data(self):
         host, port = self._get_host_and_port()
-        #print host, port
+        #print(host, port)
         address = socket.gethostbyname(host)
         for destination in self.destination_list:
             if destination.host == host and destination.port == port and destination.address == address:
@@ -122,7 +123,7 @@ class ProxyHandler(SocketServer.BaseRequestHandler):
                 self._forward_remaining_data()
         else:
             # Send and receive the data and finish the thing
-            self.send_data(socket_to=self.request, data=self._recv_timeout(self.current_destination.socket_connection))
+            self.send_data(socket_to=self.request, data=recv_timeout(self.current_destination.socket_connection))
 
     def _forward_remaining_data(self):
         """
@@ -131,7 +132,7 @@ class ProxyHandler(SocketServer.BaseRequestHandler):
         timeout = 10
         readable, writable, exceptional = select(self.readable_sockets, [], [], timeout)
         for self.current_socket in readable:
-            data = self._recv_timeout(self.current_socket)
+            data = recv_timeout(self.current_socket)
             if self.current_socket is self.request:
                 # We know is an HTTP Request
                 try:
@@ -163,11 +164,11 @@ class ProxyHandler(SocketServer.BaseRequestHandler):
 
     def send_data(self, socket_to, data):
         #().log_http(self.http_data)
-        #print self.http_data
+        #print(self.http_data)
         try:
             socket_to.sendall(data)
         except Exception as e:
-            print e.message
+            print(e.message)
             self.keep_alive = False
 
     def __get_peer_socket(self):
@@ -193,46 +194,13 @@ class ProxyHandler(SocketServer.BaseRequestHandler):
                 readable, writable, exceptional = select(self.readable_sockets, [], [], timeout)
                 for self.current_socket in readable:
                     try:
-                        data = self._recv_timeout(self.current_socket)
+                        data = recv_timeout(self.current_socket)
                         self.send_data(socket_to=self.__get_peer_socket(), data=data)
                     except:
                         return
                 if len(readable) == 0:
                     return
 
-
-    def _recv_timeout(self, s, timeout=0.5):
-        #make socket non blocking
-        s.setblocking(0)
-
-        total_data = []
-        data = ''
-
-        #beginning time
-        begin = time.time()
-        while True:
-            #if you got some data, then break after timeout
-            if total_data and time.time()-begin > timeout:
-                break
-
-            #if you got no data at all, wait a little longer, twice the timeout
-            elif time.time()-begin > timeout*2:
-                break
-
-            #recv chunks of 0x2000
-            try:
-                data = s.recv(0x2000)
-                if data:
-                    total_data.append(data)
-                    #change the beginning time for measurement
-                    begin = time.time()
-                else:
-                    #sleep for sometime to indicate a gap
-                    time.sleep(0.1)
-            except:
-                pass
-
-        return ''.join(total_data)
 
     def _get_host_and_port(self):
         if ":" in self.http_data.host:
@@ -272,7 +240,7 @@ class ProxyHandlerCertificateTest(ProxyHandler):
             return
 
         if Configuration().verbose_mode:
-            print "Web Server for host %s listening at %s on port %d" % (self.current_destination.host, server_address[0], server_address[1])
+            print("Web Server for host %s listening at %s on port %d" % (self.current_destination.host, server_address[0], server_address[1]))
         #except TestControllerException:
             # This means the TestSuite finished, do not redirect anymore
             #return

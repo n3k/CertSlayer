@@ -1,21 +1,19 @@
 __author__ = 'n3k'
 
-import ConfigParser
+import configparser
 import os
 #from OpenSSL import crypto
 
-from Utils import Singleton
+from cert_slayer.Utils import Singleton
 
 
 class ConfigurationException(Exception):
     pass
 
-class Configuration(object):
+class Configuration(metaclass=Singleton):
     """
     This class exposes methods to retrieve the filenames and saves dynamic server settings
     """
-    __metaclass__ = Singleton
-
     #SAVED_x509_GetExtension = None
 
     SECTION_CA_CERTIFICATE_SETTINGS = "CA_CERTIFICATE_SETTINGS"
@@ -39,13 +37,13 @@ class Configuration(object):
         self.verbose_mode = False
         self.config_filename = config_filename
         if self._check_file_existence():
-            self._config = ConfigParser.ConfigParser()
+            self._config = configparser.ConfigParser()
             self._config.read(self.config_filename)
 
     #@staticmethod
     #def _x509_custom_GetExtension(instance, index):
     #    extension = Configuration.SAVED_x509_GetExtension(instance, index)
-    #    print extension.get_short_name()
+    #    print(extension.get_short_name())
     #    return extension
 
     #def _hook_GetExtension_x509(self):
@@ -55,7 +53,7 @@ class Configuration(object):
     def create_new_configuration(self, config_filename):
         self.config_filename = config_filename
         if self._check_file_existence():
-            self._config = ConfigParser.ConfigParser()
+            self._config = configparser.ConfigParser()
             self._config.read(self.config_filename)
 
     def _check_file_existence(self):
@@ -65,7 +63,7 @@ class Configuration(object):
         return True
 
     def _set_defaults(self):
-        self._config = ConfigParser.ConfigParser()
+        self._config = configparser.ConfigParser()
         self._config.read(self.config_filename)
         self._create_required_sections()
         self.set_ca_certificate_filename("certslayer.net.crt")
@@ -111,14 +109,14 @@ class Configuration(object):
     def get_ca_certificate_folder(self):
         try:
             value = self._config.get(self.SECTION_CA_CERTIFICATE_SETTINGS, self.CA_CERTIFICATE_FOLDER)
-        except ConfigParser.NoOptionError:
+        except configparser.NoOptionError:
             raise ConfigurationException("The option %s doesn't exists in %s" % (self.CA_CERTIFICATE_FOLDER, self.SECTION_CA_CERTIFICATE_SETTINGS))
         return value
 
     def get_ca_certificate_filename(self):
         try:
             value = self._config.get(self.SECTION_CA_CERTIFICATE_SETTINGS, self.CA_CERTIFICATE_FILENAME)
-        except ConfigParser.NoOptionError:
+        except configparser.NoOptionError:
             raise ConfigurationException("The option %s doesn't exists in %s" % (self.CA_CERTIFICATE_FILENAME, self.SECTION_CA_CERTIFICATE_SETTINGS))
         return value
 
@@ -128,7 +126,7 @@ class Configuration(object):
     def get_ca_key_filename(self):
         try:
             value = self._config.get(self.SECTION_CA_CERTIFICATE_SETTINGS, self.CA_KEY_FILENAME)
-        except ConfigParser.NoOptionError:
+        except configparser.NoOptionError:
             raise ConfigurationException("The option %s doesn't exists in %s" % (self.CA_KEY_FILENAME, self.SECTION_CA_CERTIFICATE_SETTINGS))
         return value
 
@@ -142,7 +140,7 @@ class Configuration(object):
     def get_temp_certificate_folder(self):
         try:
             value = self._config.get(self.SECTION_TEMPORAL_CERTIFICATES, self.TEMP_CERTIFICATE_FOLDER)
-        except ConfigParser.NoOptionError:
+        except configparser.NoOptionError:
             raise ConfigurationException("The option %s doesn't exists in %s" % (self.TEMP_CERTIFICATE_FOLDER, self.SECTION_TEMPORAL_CERTIFICATES))
         return value
 

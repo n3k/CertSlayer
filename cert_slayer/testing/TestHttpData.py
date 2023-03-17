@@ -1,6 +1,6 @@
 import unittest
 
-from CertSlayer.HttpData import HttpResponse, HttpRequest
+from cert_slayer.HttpData import HttpResponse, HttpRequest
 
 """
 Run with nosetests:

@@ -1,12 +1,10 @@
 from abc import ABCMeta, abstractmethod
 
-from CertManager import CertManager
-import Utils
+from cert_slayer.CertManager import CertManager
+import cert_slayer.Utils as Utils
 
-class CertificateTC(object):
-
-    __metaclass__ = ABCMeta
-
+class CertificateTC(metaclass=ABCMeta):
+   
     def __init__(self, hostname, port):
         self.cert_manager = CertManager()
         self.hostname = hostname
@@ -105,7 +103,7 @@ class CertificateWrongCN(CertificateTC):
         new_x509.get_subject().CN = ".".join(["www", Utils.get_random_name(5), "com"])
         # Add all the extensions except for the subjectAltName
         extensions = []
-        for i in xrange(0, x509.get_extension_count()):
+        for i in range(0, x509.get_extension_count()):
             extension = x509.get_extension(i)
             if extension.get_short_name() != "subjectAltName":
                 extensions.append(extension)

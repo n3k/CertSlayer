@@ -1,5 +1,5 @@
-from ProxyTestSuite import CertificateTC
-import Utils
+from cert_slayer.ProxyTestSuite import CertificateTC
+import cert_slayer.Utils as Utils
 
 class CertificateSelfSigned(CertificateTC):
 

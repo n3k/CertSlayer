@@ -1,7 +1,7 @@
 import unittest
 import os
 
-from CertSlayer.Configuration import Configuration
+from cert_slayer.Configuration import Configuration
 
 """
 Run with nosetests:

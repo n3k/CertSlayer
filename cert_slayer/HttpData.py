@@ -1,16 +1,14 @@
 from abc import ABCMeta
-import urlparse
+from urllib.parse import urlparse
 
-from Utils import get_request_path_from_urlparse
+from cert_slayer.Utils import get_request_path_from_urlparse
 
 
 class HttpDataException(Exception):
     pass
 
-class HttpData(object):
-
-    __metaclass__ = ABCMeta
-
+class HttpData(metaclass=ABCMeta):
+   
     def __init__(self, headers={}, body=""):
         self.headers = headers
         self.body = body
@@ -61,7 +59,7 @@ class HttpRequest(HttpData):
         instance = cls()
         instance.request_method, instance.resource, instance.http_version = req.split()
         instance.request_method = instance.request_method.upper()
-        instance.resource = get_request_path_from_urlparse(urlparse.urlparse(instance.resource))
+        instance.resource = get_request_path_from_urlparse(urlparse(instance.resource))
         for k, v in [header_line.split(":", 1) for header_line in headers]:
             # No gzipped or cached content
             #if k.lower() != "if-modified-since" and k.lower() != "accept-encoding":

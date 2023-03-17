@@ -3,12 +3,12 @@ __author__ = 'n3k'
 import os
 import optparse
 
-from ProxyModeTestController import TestProxyModeController
-import ProxyTestSuite
-import StandaloneTestSuite
-from ProxyServer import ProxyServer, ProxyHandlerCertificateTest
-from StandaloneServer import StandaloneServer
-from Configuration import Configuration
+from cert_slayer.ProxyModeTestController import TestProxyModeController
+import cert_slayer.ProxyTestSuite as ProxyTestSuite
+import cert_slayer.StandaloneTestSuite as StandaloneTestSuite
+from cert_slayer.ProxyServer import ProxyServer, ProxyHandlerCertificateTest
+from cert_slayer.StandaloneServer import StandaloneServer
+from cert_slayer.Configuration import Configuration
 
 
 class CertSlayer(object):
@@ -38,11 +38,11 @@ class CertSlayer(object):
         (options, args) = parser.parse_args()
 
         if options.verbose_arg:
-            print "-Info: verbose mode enabled"
+            print("-Info: verbose mode enabled")
         Configuration().verbose_mode = options.verbose_arg
 
         if not options.port_arg:
-            print "-Info: port not specified, using 8080"
+            print("-Info: port not specified, using 8080")
         port = int(options.port_arg,10)
 
         if options.mode_arg == "proxy":
@@ -58,11 +58,11 @@ class CertSlayer(object):
                 ProxyTestSuite.CertificateUnknownCA,
                 ProxyTestSuite.CertificateSignedWithCA,
                 ProxyTestSuite.CertificateSelfSigned,
-                ProxyTestSuite.CertificateWrongCN,
-                ProxyTestSuite.CertificateSignWithMD5,
-                ProxyTestSuite.CertificateSignWithMD4,
+                ProxyTestSuite.CertificateWrongCN,                
                 ProxyTestSuite.CertificateExpired,
-                ProxyTestSuite.CertificateNotYetValid
+                ProxyTestSuite.CertificateNotYetValid,
+                ProxyTestSuite.CertificateSignWithMD5,
+                ProxyTestSuite.CertificateSignWithMD4
             ]
 
             # Set the domains that will be tracked
@@ -74,21 +74,21 @@ class CertSlayer(object):
             proxy.start()
 
         elif options.mode_arg == "standalone":
-            Configuration().fake_server_address = ("0.0.0.0", port)
+            Configuration().fake_server_address = ("0.0.0.0", 0)
             Configuration().testcase_list = [
                 StandaloneTestSuite.CertificateInvalidCASignature,
                 StandaloneTestSuite.CertificateUnknownCA,
                 StandaloneTestSuite.CertificateSignedWithCA,
                 StandaloneTestSuite.CertificateSelfSigned,
-                StandaloneTestSuite.CertificateWrongCN,
-                StandaloneTestSuite.CertificateSignWithMD5,
-                StandaloneTestSuite.CertificateSignWithMD4,
+                StandaloneTestSuite.CertificateWrongCN,                
                 StandaloneTestSuite.CertificateExpired,
-                StandaloneTestSuite.CertificateNotYetValid
+                StandaloneTestSuite.CertificateNotYetValid,
+                StandaloneTestSuite.CertificateSignWithMD5,
+                StandaloneTestSuite.CertificateSignWithMD4
             ]
             if not options.host_arg:
-                print "-Warning: hostname not given, using 'localhost'"
-            StandaloneServer().start(options.host_arg)
+                print("-Warning: hostname not given, using 'localhost'")
+            StandaloneServer().start(options.host_arg, port)
 
         else:
             parser.error('-Error: Unsupported mode')

@@ -1,12 +1,12 @@
 __author__ = 'n3k'
 
-from Configuration import Configuration
-from Logger import Logger
+from cert_slayer.Configuration import Configuration
+from cert_slayer.Logger import Logger
 from OpenSSL import crypto
-import httplib
+import http.client as httplib
 import os
 import random
-import Utils
+import cert_slayer.Utils as Utils
 
 class CertManager(object):
 
@@ -58,7 +58,7 @@ class CertManager(object):
         data += "Subject Organizational Unit: %s\n" % x509.get_subject().OU
         data += "Serial Number: %s\n" % x509.get_serial_number()
         #data += "Valid from: %s\n" % x509.get_notBefore().strftime("%Y-%m-%dT%H:%M:%S%Z")
-        data += crypto.dump_privatekey(crypto.FILETYPE_TEXT, x509.get_pubkey())
+        data += crypto.dump_privatekey(crypto.FILETYPE_TEXT, x509.get_pubkey()).decode('utf-8')
 
         data += "Issuer CN: %s\n" % x509.get_issuer().CN
         data += "Issuer Country: %s\n" % x509.get_issuer().C
@@ -67,7 +67,7 @@ class CertManager(object):
         data += "Issuer Organization: %s\n" % x509.get_issuer().O
         data += "Issuer Organizational Unit: %s\n" % x509.get_issuer().OU
 
-        for i in xrange(0, x509.get_extension_count()):
+        for i in range(0, x509.get_extension_count()):
             extension = x509.get_extension(i)
             try:
                 data += "Extension - " + extension.get_short_name() + " " + extension.get_data() + "\n"
@@ -106,8 +106,8 @@ class CertManager(object):
         ca_cert.set_pubkey(k)
 
         # Add x509 required extensions for a CA Cert
-        ca_cert.add_extensions([crypto.X509Extension("basicConstraints", True, "CA:TRUE, pathlen:0"),
-                                crypto.X509Extension("keyUsage", True, "keyCertSign, cRLSign")
+        ca_cert.add_extensions([crypto.X509Extension(b"basicConstraints", True, b"CA:TRUE, pathlen:0"),
+                                crypto.X509Extension(b"keyUsage", True, b"keyCertSign, cRLSign")
                                ])
 
         # Self Signed here :)
@@ -144,9 +144,9 @@ class CertManager(object):
         crt_filename = Configuration().get_ca_certificate_file()
         key_filename = Configuration().get_ca_key_file()
         with open(crt_filename, "wt") as f:
-            f.write(crypto.dump_certificate(crypto.FILETYPE_PEM, cert))
+            f.write(crypto.dump_certificate(crypto.FILETYPE_PEM, cert).decode('utf-8'))
         with open(key_filename, "wt") as f:
-            f.write(crypto.dump_privatekey(crypto.FILETYPE_PEM, key))
+            f.write(crypto.dump_privatekey(crypto.FILETYPE_PEM, key).decode('utf-8'))
         return crt_filename, key_filename
 
     def create_X509Name(self, x509_details={}):
@@ -223,9 +223,9 @@ class CertManager(object):
         crt_filename = os.path.abspath(os.path.join(temp_folder, crt_filename))
         key_filename = os.path.abspath(os.path.join(temp_folder, key_filename))
         with open(crt_filename, "wt") as f:
-            f.write(crypto.dump_certificate(crypto.FILETYPE_PEM, cert))
+            f.write(crypto.dump_certificate(crypto.FILETYPE_PEM, cert).decode('utf-8'))
         with open(key_filename, "wt") as f:
-            f.write(crypto.dump_privatekey(crypto.FILETYPE_PEM, key))
+            f.write(crypto.dump_privatekey(crypto.FILETYPE_PEM, key).decode('utf-8'))
         return crt_filename, key_filename
 
     @classmethod
@@ -235,7 +235,69 @@ class CertManager(object):
         x509 = crypto.load_certificate(crypto.FILETYPE_ASN1, c.sock.getpeercert(True))
         return x509
 
-if __name__ == "__main__":
-    cert_manager = CertManager()
+##################################################
+##################################################
+## CLI ############################
+##################################################
+##################################################
+
+import optparse
+
+
+def main():
+    parser = optparse.OptionParser()
+    parser.add_option("-d", "--domain", dest="domains_arg", action="append",
+                        help="Domain to be monitored, might be used multiple times and supports regular expressions (Only valid for proxy mode)")
+    parser.add_option("-p", "--port", dest="port_arg", action="store",
+                        default="8080", help="port to listen")
+    parser.add_option("-m", "--mode", dest="mode_arg", action="store",
+                        default="proxy", help="Operation mode: proxy or standalone")
+    parser.add_option("-i", "--hostname", dest="host_arg", action="store",
+                        default="localhost",
+                        help="Hostname: the IP address or Domain name that the certificate CN will stand for (Only valid for standalone mode)")
+    parser.add_option("-v", "--verbose", dest="verbose_arg", default=False,
+                        action="store_true", help="Verbose mode")
+    (options, args) = parser.parse_args()
+
+    if options.verbose_arg:
+        print("-Info: verbose mode enabled")
+    Configuration().verbose_mode = options.verbose_arg
+
+    if not options.port_arg:
+        print("-Info: port not specified, using 8080")
+    port = int(options.port_arg,10)
+
+
+def test_parsing_1():
+    cert_manager = CertManager()    
     x509 = cert_manager.get_domain_certificate("www.facebook.com", 443)
-    print x509.get_subject()
+    print(x509.get_subject())
+
+if __name__ == "__main__":
+    '''
+            subject = ca_certificate_details.get("subject", {})
+
+        ca_cert = crypto.X509()
+        ca_cert.set_version(2) # Version 3 - we need extensions
+        ca_cert.set_serial_number(1)
+        ca_cert.get_subject().C = subject.get("C", "US") #Country
+        ca_cert.get_subject().ST = subject.get("ST", "EarthRealm") #State
+        ca_cert.get_subject().L = subject.get("L", "Racoon") #City
+        ca_cert.get_subject().O = subject.get("O", "Black Mesa") #Organization
+        ca_cert.get_subject().OU = subject.get("OU", "Lambda") #Organizational Unit
+        ca_cert.get_subject().CN = subject.get("CN", "certslayer.net")
+
+    '''
+    details = {
+        "subject": {
+            "C": "asd",
+            "ST": "asd",
+            "L": "asd",
+            "O": "asd",
+            "OU": "asd",
+            "CN": "asd",            
+        }
+    }
+
+    CertManager.create_ca_certificate(ca_certificate_details=details)
+    

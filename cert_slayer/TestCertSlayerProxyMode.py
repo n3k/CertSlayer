@@ -1,9 +1,9 @@
 import os
 
-from ProxyModeTestController import TestProxyModeController
-import ProxyTestSuite
-from ProxyServer import ProxyServer, ProxyHandlerCertificateTest
-from Configuration import Configuration
+from cert_slayer.ProxyModeTestController import TestProxyModeController
+import cert_slayer.ProxyTestSuite as ProxyTestSuite
+from cert_slayer.ProxyServer import ProxyServer, ProxyHandlerCertificateTest
+from cert_slayer.Configuration import Configuration
 
 
 class TestCertSlayerProxyMode(object):
@@ -25,11 +25,11 @@ class TestCertSlayerProxyMode(object):
             ProxyTestSuite.CertificateUnknownCA,
             ProxyTestSuite.CertificateSignedWithCA,
             ProxyTestSuite.CertificateSelfSigned,
-            ProxyTestSuite.CertificateWrongCN,
-            ProxyTestSuite.CertificateSignWithMD5,
-            ProxyTestSuite.CertificateSignWithMD4,
+            ProxyTestSuite.CertificateWrongCN,            
             ProxyTestSuite.CertificateExpired,
-            ProxyTestSuite.CertificateNotYetValid
+            ProxyTestSuite.CertificateNotYetValid,
+            ProxyTestSuite.CertificateSignWithMD5,
+            ProxyTestSuite.CertificateSignWithMD4
         ]
         TestProxyModeController.set_monitored_domains(["www.facebook.com"])
         ProxyAddress = ("127.0.0.1", 4444)

@@ -1,11 +1,9 @@
-from Utils import Singleton
+from cert_slayer.Utils import Singleton
 
-class Logger(object):
+class Logger(metaclass=Singleton):
     """
     This will Log HTTPData requests as well as other events like exceptions
     """
-
-    __metaclass__ = Singleton
 
     def __init__(self, logfile="logfile.txt"):
         self.logfile = logfile

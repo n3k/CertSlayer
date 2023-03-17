@@ -1,9 +1,9 @@
 import unittest
 import os
 
-from CertSlayer.FakeTLSServer import WebServerSetup
-from CertSlayer.CertManager import CertManager
-from CertSlayer.Configuration import Configuration
+from cert_slayer.FakeTLSServer import WebServerSetup
+from cert_slayer.CertManager import CertManager
+from cert_slayer.Configuration import Configuration
 
 """
 Run with nosetests:

@@ -3,8 +3,8 @@ import os
 
 import OpenSSL
 
-from CertSlayer.CertManager import CertManager
-from CertSlayer.Configuration import Configuration
+from cert_slayer.CertManager import CertManager
+from cert_slayer.Configuration import Configuration
 
 """
 Run with nosetests:
